@@ -149,6 +149,71 @@ namespace MyDatabase
         }
 
         */
+
+        // -------
+
+        /*
+         using Microsoft.Data.SqlClient;
+using System;
+using System.Data;
+
+public static class SqlExtensions
+{
+    public static void ExecuteQuery(this SqlConnection connection, string query, Action<SqlDataReader> handleRow)
+    {
+        using (var command = new SqlCommand(query, connection))
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                handleRow(reader);  // Передаем обработку строки
+            }
+        }
+    }
+
+    public static int ExecuteNonQuery(this SqlConnection connection, string query, params SqlParameter[] parameters)
+    {
+        using (var command = new SqlCommand(query, connection))
+        {
+            command.Parameters.AddRange(parameters);
+            return command.ExecuteNonQuery();
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        string connectionString = "Server=your_server_name;Database=your_database_name;User Id=your_username;Password=your_password;";
+
+        using (var connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            // Пример SELECT-запроса
+            string selectQuery = "SELECT Id, Name FROM Users";
+            connection.ExecuteQuery(selectQuery, reader =>
+            {
+                int id = reader.GetInt32(0);
+                string name = reader.GetString(1);
+                Console.WriteLine($"Id: {id}, Name: {name}");
+            });
+
+            // Пример INSERT-запроса
+            string insertQuery = "INSERT INTO Users (Name, Age) VALUES (@name, @age)";
+            var parameters = new[]
+            {
+                new SqlParameter("@name", "John Doe"),
+                new SqlParameter("@age", 30)
+            };
+            int rowsAffected = connection.ExecuteNonQuery(insertQuery, parameters);
+            Console.WriteLine($"Rows affected: {rowsAffected}");
+        }
+    }
+}
+
+         */
     }
 
 }
