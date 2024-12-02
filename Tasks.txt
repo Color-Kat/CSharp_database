@@ -1,1 +1,50 @@
-1;11;mathematics;logariphms;10
+1;3;Math;Algebra;5
+2;7;Math;Geometry;6
+3;5;Science;Optics;9
+4;9;Math;Trigonometry;3
+5;2;Science;Genetics;7
+6;8;History;Ancient Civilizations;10
+7;6;Literature;Shakespeare;4
+8;4;Math;Calculus;9
+9;3;Science;Organic Chemistry;6
+10;10;Math;Probability;2
+11;1;Science;Thermodynamics;10
+12;6;Math;Statistics;7
+13;5;History;World War II;4
+14;7;Literature;Poetry;8
+15;9;Math;Algebra;10
+16;2;Science;Ecology;3
+17;4;Math;Linear Algebra;6
+18;8;History;Renaissance;10
+19;3;Literature;Modernism;5
+20;11;Math;Differential Equations;9
+21;5;Science;Quantum Mechanics;8
+22;6;Math;Calculus;7
+23;8;Science;Inorganic Chemistry;2
+24;4;History;Medieval Europe;10
+25;2;Literature;Victorian Novels;7
+26;7;Math;Mathematical Logic;9
+27;9;Science;Evolution;5
+28;1;History;Cold War;3
+29;10;Literature;Gothic Fiction;8
+30;4;Math;Mathematical Modeling;6
+31;3;Science;Relativity;10
+32;9;Math;Number Theory;4
+33;6;Science;Biochemistry;7
+34;2;History;French Revolution;9
+35;7;Literature;Elizabethan Drama;5
+36;1;Math;Game Theory;2
+37;5;Science;Human Anatomy;6
+38;8;History;Industrial Revolution;10
+39;4;Literature;Postmodernism;3
+40;9;Math;Graph Theory;7
+41;11;Science;Electromagnetism;10
+42;2;Math;Mathematical Proofs;4
+43;5;Science;Environmental Chemistry;7
+44;7;History;Ancient Rome;3
+45;6;Literature;Romanticism;10
+46;10;Math;Set Theory;6
+47;4;Science;Cell Biology;2
+48;1;History;World War I;7
+49;8;Literature;19th Century Fiction;9
+50;3;Math;Topology;1
