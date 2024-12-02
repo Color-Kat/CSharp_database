@@ -32,6 +32,7 @@
             uploadCSVButton = new Button();
             mergeTablesButton = new Button();
             label2 = new Label();
+            openFileDialog = new OpenFileDialog();
             SuspendLayout();
             // 
             // label1
@@ -73,6 +74,10 @@
             label2.Text = "Merge two tables in DB into one";
             label2.Click += label2_Click;
             // 
+            // openFileDialog
+            // 
+            openFileDialog.FileName = "openFileDialog1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
@@ -94,5 +99,6 @@
         private Button uploadCSVButton;
         private Button mergeTablesButton;
         private Label label2;
+        private OpenFileDialog openFileDialog;
     }
 }

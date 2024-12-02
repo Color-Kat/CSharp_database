@@ -5,14 +5,20 @@ namespace MyDatabase
     public partial class Form1 : Form
     {
 
-        DBService DBService = new DBService(
-            @"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;"
-//            @"Server=COLORKAT-LAPTOP;Database=MySchool;Encrypt=True;TrustServerCertificate=True "
-        );
+        private readonly DBService _dbService;
+        private readonly DataImporter _dataImporter;
 
         public Form1()
         {
             InitializeComponent();
+
+            // Manually instantiate services (simple DI setup)
+            _dbService = new DBService(
+                @"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;")
+            {
+
+            };
+            _dataImporter = new DataImporter(_dbService);
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -22,6 +28,7 @@ namespace MyDatabase
 
         private void uploadCSVButton_Click(object sender, EventArgs e)
         {
+            /*
             string query = "SELECT * FROM Students";
             SqlDataReader reader = DBService.ExecuteReader(query);
 
@@ -33,6 +40,14 @@ namespace MyDatabase
             }
 
             reader.Close();
+            */
+
+            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                _dataImporter.importDataFromTxt(openFileDialog.FileName, "Tasks");
+            }
+
+
         }
 
         private void mergeTablesButton_Click(object sender, EventArgs e)

@@ -77,9 +77,9 @@ namespace MyDatabase
             return command.ExecuteNonQuery();
         }
 
-
-        /*
-        // Метод для выполнения SQL-запроса с параметрами
+        /**
+         * Execute query with param to preven sql injection
+         */
         public int ExecuteNonQueryWithParams(string query, Dictionary<string, object> parameters)
         {
             SqlCommand command = new SqlCommand(query, _connection);
@@ -90,19 +90,9 @@ namespace MyDatabase
             return command.ExecuteNonQuery();
         }
 
-        // Метод для выполнения BulkCopy (быстрая вставка большого объема данных)
-        public void BulkInsert(DataTable dataTable, string tableName)
-        {
-            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(_connection))
-            {
-                bulkCopy.DestinationTableName = tableName;
-                bulkCopy.BatchSize = 1000; // размер пакета
-                bulkCopy.BulkCopyTimeout = 600; // таймаут
-                bulkCopy.WriteToServer(dataTable);
-            }
-        }
-
-        // Метод для выполнения транзакции (несколько запросов в одном атомарном блоке)
+        /**
+         * Execute transaction (a bunch of sql queries)
+         */
         public void ExecuteTransaction(List<string> queries)
         {
             SqlTransaction transaction = _connection.BeginTransaction();
@@ -120,6 +110,19 @@ namespace MyDatabase
             {
                 transaction.Rollback();
                 throw;
+            }
+        }
+
+        /*
+        // Метод для выполнения BulkCopy (быстрая вставка большого объема данных)
+        public void BulkInsert(DataTable dataTable, string tableName)
+        {
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(_connection))
+            {
+                bulkCopy.DestinationTableName = tableName;
+                bulkCopy.BatchSize = 1000; // размер пакета
+                bulkCopy.BulkCopyTimeout = 600; // таймаут
+                bulkCopy.WriteToServer(dataTable);
             }
         }
 
