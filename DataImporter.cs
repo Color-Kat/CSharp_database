@@ -41,6 +41,7 @@ namespace MyDatabase
 
                     MessageBox.Show($"INSERT INTO {tableName} VALUES ({valuePlaceholders})");
 
+                    // Should i close connection manually?
                     _dbService.ExecuteNonQuery($"INSERT INTO {tableName} VALUES ({valuePlaceholders})");
                 }
             }

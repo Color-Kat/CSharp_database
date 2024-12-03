@@ -13,7 +13,7 @@ namespace MyDatabase
     {
 
         private readonly string _connectionString;
-        private SqlConnection _connection;
+        public SqlConnection Connection;
 
         public DBService(string connectionString)
         {
@@ -35,14 +35,14 @@ namespace MyDatabase
          */
         public void OpenConnection()
         {
-            if(_connection == null)
+            if(Connection == null)
             {
-                _connection = new SqlConnection(_connectionString);
+                Connection = new SqlConnection(_connectionString);
             } 
 
-            if(_connection.State != ConnectionState.Open)
+            if(Connection.State != ConnectionState.Open)
             {
-                _connection.Open();
+                Connection.Open();
             }
         }
 
@@ -51,9 +51,9 @@ namespace MyDatabase
          */
         public void CloseConnection()
         {
-            if (_connection != null && _connection.State == ConnectionState.Open)
+            if (Connection != null && Connection.State == ConnectionState.Open)
             {
-                _connection.Close();
+                Connection.Close();
             }
         }
 
@@ -64,7 +64,7 @@ namespace MyDatabase
          */
         public SqlDataReader ExecuteReader(string query)
         {
-            SqlCommand command = new SqlCommand(query, _connection);
+            SqlCommand command = new SqlCommand(query, Connection);
             return command.ExecuteReader();
         }
 
@@ -73,7 +73,7 @@ namespace MyDatabase
          */
         public int ExecuteNonQuery(string query)
         {
-            SqlCommand command = new SqlCommand(query, _connection);
+            SqlCommand command = new SqlCommand(query, Connection);
             return command.ExecuteNonQuery();
         }
 
@@ -82,7 +82,7 @@ namespace MyDatabase
          */
         public int ExecuteNonQueryWithParams(string query, Dictionary<string, object> parameters)
         {
-            SqlCommand command = new SqlCommand(query, _connection);
+            SqlCommand command = new SqlCommand(query, Connection);
             foreach (var param in parameters)
             {
                 command.Parameters.AddWithValue(param.Key, param.Value);
@@ -95,13 +95,13 @@ namespace MyDatabase
          */
         public void ExecuteTransaction(List<string> queries)
         {
-            SqlTransaction transaction = _connection.BeginTransaction();
+            SqlTransaction transaction = Connection.BeginTransaction();
 
             try
             {
                 foreach (var query in queries)
                 {
-                    SqlCommand command = new SqlCommand(query, _connection, transaction);
+                    SqlCommand command = new SqlCommand(query, Connection, transaction);
                     command.ExecuteNonQuery();
                 }
                 transaction.Commit();
