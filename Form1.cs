@@ -7,14 +7,16 @@ namespace MyDatabase
 
         private readonly DBService _dbService;
         private readonly DataImporter _dataImporter;
+        private readonly TaskMerger _taskMerger;
 
         public Form1()
         {
             InitializeComponent();
 
             // Manually instantiate services (simple DI setup)
-            _dbService = new DBService(@"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;");
+            _dbService = new DBService(@"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True;");
             _dataImporter = new DataImporter(_dbService);
+            _taskMerger = new TaskMerger(_dbService);
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -48,7 +50,7 @@ namespace MyDatabase
 
         private void mergeTablesButton_Click(object sender, EventArgs e)
         {
-
+            _taskMerger.MergeTasks();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace MyDatabase
 
         private struct Student
         {
-            public string id;
+            public int id;
             public string name;
             public int class_number;
         }
@@ -30,11 +30,11 @@ namespace MyDatabase
         // Bucket is a struct that stores 
         // a bunch of students that have the same criterias.
         // (In this case - class number)
-        private struct Bucket
+        private struct Bucket()
         {
             public string student_id;
             public string task_id;
-            public List<Task> Tasks; // List of tasks
+            public List<Task> Tasks = new List<Task>(); // List of tasks
         }
 
         private readonly DBService _dbService;
@@ -53,6 +53,7 @@ namespace MyDatabase
 
             // This table is a join of students and tasks
             _studentTaskAssigmentsTable = new DataTable();
+            
             _studentTaskAssigmentsTable.Columns.Add("id", typeof(string));
             _studentTaskAssigmentsTable.Columns.Add("student_id", typeof(string));
             _studentTaskAssigmentsTable.Columns.Add("student_name", typeof(string));
@@ -60,22 +61,25 @@ namespace MyDatabase
 
             _studentTaskAssigmentsTable.Columns.Add("task_id", typeof(string));
             _studentTaskAssigmentsTable.Columns.Add("subject", typeof(string));
-            _studentTaskAssigmentsTable.Columns.Add("topic", typeof(string));
+            _studentTaskAssigmentsTable.Columns.Add("theme", typeof(string));
             _studentTaskAssigmentsTable.Columns.Add("complexity_level", typeof(int));
+            
 
             _bulkCopy = new SqlBulkCopy(_dbService.Connection)
             {
                 DestinationTableName = "StudentTaskAssigments"
             };
 
-            _bulkCopy.ColumnMappings.Add("id", "");
-            _bulkCopy.ColumnMappings.Add("student_id", "");
+            
+            _bulkCopy.ColumnMappings.Add("id", "id");
+            _bulkCopy.ColumnMappings.Add("student_id", "student_id");
             _bulkCopy.ColumnMappings.Add("student_name", "student_name");
-            _bulkCopy.ColumnMappings.Add("class_number", "class");
+            _bulkCopy.ColumnMappings.Add("class", "class");
             _bulkCopy.ColumnMappings.Add("task_id", "task_id");
             _bulkCopy.ColumnMappings.Add("subject", "subject");
-            _bulkCopy.ColumnMappings.Add("topic", "topic");
+            _bulkCopy.ColumnMappings.Add("theme", "theme");
             _bulkCopy.ColumnMappings.Add("complexity_level", "complexity_level");
+            
         }
 
         private int CompareBucket(int classNumber)
@@ -95,68 +99,80 @@ namespace MyDatabase
         {
             Student currentSudent = new Student();
 
+            // Read records from studen_task
             using (var studentTaskReader = _dbService.ExecuteReader("SELECT * FROM StudentTask ORDER BY student_id"))
             {
-                while(studentTaskReader.Read()) {
+                while (studentTaskReader.Read())
+                {
+                    // Get student and task id for custom join
+                    string studentId = studentTaskReader.GetString(0);
+                    string taskId = studentTaskReader.GetString(1);
 
-                    string studentId = studentTaskReader.GetString(1);
-                    string taskId = studentTaskReader.GetString(2);
+                    // Reach new task, get it by id
+                    // if (_currentBucket.task_id != taskId)
+                    // {
+                    //    _currentBucket.task_id = taskId;
 
                     using (var taskReader = _dbService.ExecuteReader($"SELECT * FROM Tasks WHERE id = {taskId}  ORDER BY id"))
                     {
-                        Task task = new Task();
-                        task.id = taskId;
-                        task.class_number = taskReader.GetInt16(1);
-                        task.subject = taskReader.GetString(2);
-                        task.topic = taskReader.GetString(3);
-                        task.complexity_level = taskReader.GetInt16(4);
+                        if (taskReader.Read())
+                        {
 
-                        _currentBucket.Tasks.Add(task);
+                            Task task = new Task();
+                            task.id = taskId;
+                            task.class_number = taskReader.GetInt16(1);
+                            task.subject = taskReader.GetString(2);
+                            task.topic = taskReader.GetString(3);
+                            task.complexity_level = taskReader.GetInt16(4);
+
+                            // Add it to current basker
+                            _currentBucket.Tasks.Add(task);
+                        }
                     }
+                    // }
 
-                    // Reach new student
+                    // Reach new student, get it from db
                     if (_currentBucket.student_id != studentId)
                     {
+                        // Before save the nex student
+                        // Save into db the previous data
+                        foreach (var task in _currentBucket.Tasks)
+                        {
+                            _studentTaskAssigmentsTable.Rows.Add(
+                                null,
+                                currentSudent.id,
+                                currentSudent.name,
+                                currentSudent.class_number,
+                                task.id,              // task_id
+                                task.subject,         // task subject
+                                task.topic,           // task topic (theme)
+                                task.complexity_level // task complexity level
+                            );
+                        }
+
                         _currentBucket.student_id = studentId;
 
                         using (var studentReader = _dbService.ExecuteReader($"SELECT * FROM Students WHERE id = {studentId} ORDER BY id"))
                         {
-                            currentSudent.id = studentReader.GetString(0);
-                            currentSudent.name = studentReader.GetString(1);
-                            currentSudent.class_number = studentReader.GetInt16(2);
+                            if (studentReader.Read())
+                            {
+                                currentSudent.id = studentReader.GetInt32(2);
+                                currentSudent.name = studentReader.GetString(0);
+                                currentSudent.class_number = studentReader.GetInt16(1);
+                            }
                         }
-                    }
-
-
-
-
-                        if(!_currentBucket.student_id.Equals(studentId)) {
-                            var students = studentReader.Read();
-                        }
-
-                        
-                        foreach (var student in _currentBucket.Students) {
-                            _studentTaskAssigmentsTable.Rows.Add(
-                                student.id,
-                                student.name,
-                                student.class_number,
-                                taskReader.GetString(0), // task_id
-                                taskReader.GetString(2), // task subject
-                                taskReader.GetString(3), // task topic
-                                taskReader.GetString(4)  // task complexity level
-                            );
-                        }
-                        
-
-                        // После завершения цикла вставляем все данные в таблицу
-                        _bulkCopy.BatchSize = _studentTaskAssigmentsTable.Rows.Count;
-                        _bulkCopy.BulkCopyTimeout = 600;
-                        _bulkCopy.WriteToServer(_studentTaskAssigmentsTable);
-                        _bulkCopy.Close();
                     }
                 }
 
             }
+
+            // Save joined data into databse
+            _bulkCopy.BatchSize = _studentTaskAssigmentsTable.Rows.Count;
+            _bulkCopy.BulkCopyTimeout = 600;
+            _bulkCopy.WriteToServer(_studentTaskAssigmentsTable);
+            _bulkCopy.Close();
+
+            MessageBox.Show("Data is joined");
         }
 
         /*public void _Init()
