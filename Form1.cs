@@ -13,11 +13,7 @@ namespace MyDatabase
             InitializeComponent();
 
             // Manually instantiate services (simple DI setup)
-            _dbService = new DBService(
-                @"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;")
-            {
-
-            };
+            _dbService = new DBService(@"Server=COLORKAT-LAPTOP;Database=MySchool;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;");
             _dataImporter = new DataImporter(_dbService);
         }
 
