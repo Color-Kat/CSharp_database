@@ -113,6 +113,11 @@ namespace MyDatabase
             }
         }
 
+        public void ClearTable(string tableName)
+        {
+            ExecuteNonQuery("TRUNCATE TABLE " + tableName);
+        }
+
         /*
         // Метод для выполнения BulkCopy (быстрая вставка большого объема данных)
         public void BulkInsert(DataTable dataTable, string tableName)

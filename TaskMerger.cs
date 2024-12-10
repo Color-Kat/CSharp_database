@@ -97,6 +97,9 @@ namespace MyDatabase
 
         public void MergeTasks()
         {
+            // Clear previous data befor merge
+            _dbService.ClearTable("StudentTaskAssigments");
+
             Student currentSudent = new Student();
 
             // Read records from studen_task
@@ -108,17 +111,12 @@ namespace MyDatabase
                     string studentId = studentTaskReader.GetString(0);
                     string taskId = studentTaskReader.GetString(1);
 
-                    // Reach new task, get it by id
-                    // if (_currentBucket.task_id != taskId)
-                    // {
-                    //    _currentBucket.task_id = taskId;
-
+                    // Get task for this student by task id
+                    Task task = new Task();
                     using (var taskReader = _dbService.ExecuteReader($"SELECT * FROM Tasks WHERE id = {taskId}  ORDER BY id"))
                     {
                         if (taskReader.Read())
                         {
-
-                            Task task = new Task();
                             task.id = taskId;
                             task.class_number = taskReader.GetInt16(1);
                             task.subject = taskReader.GetString(2);
@@ -129,28 +127,12 @@ namespace MyDatabase
                             _currentBucket.Tasks.Add(task);
                         }
                     }
-                    // }
 
                     // Reach new student, get it from db
                     if (_currentBucket.student_id != studentId)
                     {
-                        // Before save the nex student
-                        // Save into db the previous data
-                        foreach (var task in _currentBucket.Tasks)
-                        {
-                            _studentTaskAssigmentsTable.Rows.Add(
-                                null,
-                                currentSudent.id,
-                                currentSudent.name,
-                                currentSudent.class_number,
-                                task.id,              // task_id
-                                task.subject,         // task subject
-                                task.topic,           // task topic (theme)
-                                task.complexity_level // task complexity level
-                            );
-                        }
-
                         _currentBucket.student_id = studentId;
+                        _currentBucket.Tasks = new List<Task>();
 
                         using (var studentReader = _dbService.ExecuteReader($"SELECT * FROM Students WHERE id = {studentId} ORDER BY id"))
                         {
@@ -161,7 +143,19 @@ namespace MyDatabase
                                 currentSudent.class_number = studentReader.GetInt16(1);
                             }
                         }
-                    }
+                    } 
+                    
+                    _studentTaskAssigmentsTable.Rows.Add(
+                        null,
+                        currentSudent.id,
+                        currentSudent.name,
+                        currentSudent.class_number,
+                        task.id,              // task_id
+                        task.subject,         // task subject
+                        task.topic,           // task topic (theme)
+                        task.complexity_level // task complexity level
+                    );
+                    
                 }
 
             }
